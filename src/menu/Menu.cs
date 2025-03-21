@@ -19,6 +19,9 @@ public partial class Menu : Control, IMenu {
   public IButton NewGameButton { get; set; } = default!;
   [Node]
   public IButton LoadGameButton { get; set; } = default!;
+
+  [Node]
+  public ILabel SteamUsernameLabel {get; set;} = default!;
   #endregion Nodes
 
   #region Signals
@@ -31,6 +34,15 @@ public partial class Menu : Control, IMenu {
   public void OnReady() {
     NewGameButton.Pressed += OnNewGamePressed;
     LoadGameButton.Pressed += OnLoadGamePressed;
+
+    // Initial value (in case Steam init completed before Menu was ready)
+    SteamUsernameLabel.Text = $"Steam Username: {SteamRunner.NetworkingRepo.PersonaName.Value}";
+
+
+    // Subscribe to future updates
+    SteamRunner.NetworkingRepo.PersonaName.Sync += (name) => {
+      SteamUsernameLabel.Text = $"Steam Username: {name}";
+    };
   }
 
   public void OnExitTree() {
